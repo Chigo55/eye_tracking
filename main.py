@@ -23,15 +23,17 @@ def eye_tracking(image, magnificate = 3):
     print("Right: " + "X" + "-" + str(right_x_per) + "%", "Y" + "-" + str(right_y_per) + "%")
     print("Left: " + "X" + "-" + str(left_x_per) + "%", "Y" + "-" + str(left_y_per) + "%")
 
-    cv.imshow("Picture", clone)
-    cv.waitKey(0)
+    return
 
 img_path = "C:/Users/user/PycharmProjects/pythonProject/picture/"
 image_list = os.listdir(img_path)
 for data in image_list:
     print(data)
     img_data = cv.imread(img_path + data)
-    eye_tracking(img_data)
+    image = eye_tracking(img_data)
+
+    cv.imshow("", image)
+    cv.waitKey(0)
 
 """image = cv.imread("C:/Users/user/PycharmProjects/pythonProject/picture/images8.jfif")
 eye_tracking(image)"""

@@ -8,7 +8,7 @@ from datetime import datetime
 driver = webdriver.Chrome()
 driver.get("https://www.google.co.kr/imghp?hl=ko&ogbl")
 elem = driver.find_element(By.NAME, "q")
-elem.send_keys("face")
+elem.send_keys("얼굴")
 elem.send_keys(Keys.RETURN)
 images = driver.find_elements(By.CSS_SELECTOR, ".rg_i.Q4LuWd")
 

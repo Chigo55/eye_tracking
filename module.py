@@ -166,7 +166,7 @@ def irisPosition(image, gray ,eye_points):
     eye_image = cv.GaussianBlur(eye_image, (0, 0), 1)
 
     # 전역 임계처리를 이용하여 이미지의 이진화 및 임계처리
-    _, threshold_eye = cv.threshold(eye_image, 48, 255, cv.THRESH_BINARY_INV)
+    _, threshold_eye = cv.threshold(eye_image, 70, 255, cv.THRESH_BINARY_INV)
 
     # 이진화된 이미지를 이용하여 이지미에서 눈동자로 인식되는 외각선 검출
     contour = contours(threshold_eye)
