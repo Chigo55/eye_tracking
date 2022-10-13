@@ -157,15 +157,15 @@ def irisPosition(image, eye_points):
     eye_image = cv.bitwise_and(gray, gray, mask=mask)
 
     # 눈 이미지의 최소 지점과 최대 지점의 좌표를 구한다
-    maxX = (max(eye_points, key=lambda item: item[0]))[0]
-    minX = (min(eye_points, key=lambda item: item[0]))[0]
-    maxY = (max(eye_points, key=lambda item: item[1]))[1]
-    minY = (min(eye_points, key=lambda item: item[1]))[1]
+    max_x = (max(eye_points, key=lambda item: item[0]))[0]
+    min_x = (min(eye_points, key=lambda item: item[0]))[0]
+    max_y = (max(eye_points, key=lambda item: item[1]))[1]
+    min_y = (min(eye_points, key=lambda item: item[1]))[1]
 
     # 검은색의 마스크를 씌운 그레이 이미지의 마스크를 흰색으로 변환
     eye_image[mask == 0] = 255
 
-    eye_image   = eye_image[minY:maxY, minX:maxX]
+    eye_image = eye_image[min_y:max_y, min_x:max_x]
 
     # 사진의 잡음 제거를 위해 가우시안 블러를 이용하여 블러 처리
     eye_image = cv.GaussianBlur(eye_image, (0, 0), 1)
@@ -195,7 +195,13 @@ def irisPosition(image, eye_points):
     # 눈동자의 좌표 출력
     print("눈동자 중심점", (cx, cy))
 
+    # 눈동자의 위치를 눈의 쉬치에 대해 상대 %로 계산 및 표시
+    x_per = ((cx-min_x) / (max_x - min_x)) * 100
+    y_per = ((cy-min_y) / (max_y - min_y)) * 100
 
+    print(x_per, y_per)
+
+    print("X" + str(x_per) + "%", "Y" + str(y_per) + "%")
 
     return mask
 
