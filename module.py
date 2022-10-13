@@ -137,10 +137,7 @@ def blinkDetector(eye_point):
     return blinkRatio, top_mid, bottom_mid
 
 
-def irisPosition(image, eye_points):
-    # 컬러 이미지 그레이 스케일 이미지로 변환
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
+def irisPosition(image, gray ,eye_points):
     # 그레이 스케일 이미지의 디멘션 get
     dim = gray.shape
 
@@ -165,13 +162,11 @@ def irisPosition(image, eye_points):
     # 검은색의 마스크를 씌운 그레이 이미지의 마스크를 흰색으로 변환
     eye_image[mask == 0] = 255
 
-    eye_image = eye_image[min_y:max_y, min_x:max_x]
-
     # 사진의 잡음 제거를 위해 가우시안 블러를 이용하여 블러 처리
     eye_image = cv.GaussianBlur(eye_image, (0, 0), 1)
 
     # 전역 임계처리를 이용하여 이미지의 이진화 및 임계처리
-    _, threshold_eye = cv.threshold(eye_image, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
+    _, threshold_eye = cv.threshold(eye_image, 48, 255, cv.THRESH_BINARY_INV)
 
     # 이진화된 이미지를 이용하여 이지미에서 눈동자로 인식되는 외각선 검출
     contour = contours(threshold_eye)
@@ -179,37 +174,29 @@ def irisPosition(image, eye_points):
     # 인식된 외각선 중 가장 큰 1개만을 가져옴
     cnt = contour[0]
 
-    # convexhull을 이용하여 외각선 근사 처리
-    hull = cv.convexHull(cnt)
+    # fitEllipse를 이용하여 외각선 근사 처리 및 사진에 표시
+    ellipse = cv.fitEllipse(cnt)
+    cv.ellipse(image, ellipse, BLUE, 2)
 
-    # 근사처리한 외각선을 그린다
-    cv.drawContours(image, [hull], -1, BLUE, 2)
+    # ellipse의 중심 좌표를 가져와 눈동자의 좌표값을 구한다
+    position = ellipse[0]
+    pos = []
+    for i in range(2):
+        pos.append(math.trunc(position[i]))
 
-    # 외각선의 무게중심을 구한다
-    moment = cv.moments(hull)
+    # 눈동자의 위치를 눈 크기에 대해 상대 %로 계산 및 표시
+    x_per = ((pos[0] - min_x) / (max_x - min_x)) * 100
+    y_per = ((pos[1] - min_y) / (max_y - min_y)) * 100
+    x_per = math.trunc(x_per)
+    y_per = math.trunc(y_per)
 
-    # 외각선의 무게중심 좌표를 가져와 사진의 좌표값을 구한다
-    cx = int(moment["m10"] / moment["m00"])
-    cy = int(moment["m01"] / moment["m00"])
-
-    # 눈동자의 좌표 출력
-    print("눈동자 중심점", (cx, cy))
-
-    # 눈동자의 위치를 눈의 쉬치에 대해 상대 %로 계산 및 표시
-    x_per = ((cx-min_x) / (max_x - min_x)) * 100
-    y_per = ((cy-min_y) / (max_y - min_y)) * 100
-
-    print(x_per, y_per)
-
-    print("X" + str(x_per) + "%", "Y" + str(y_per) + "%")
-
-    return mask
+    return image, x_per, y_per
 
 def contours(threshold_image):
     # 이진화된 이미지에서 눈동자의 윤곽을 찾는다
-    contours, _ = cv.findContours(threshold_image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(threshold_image, cv.RETR_LIST, cv.CHAIN_APPROX_TC89_KCOS)
 
     # 찾은 윤곽을 정렬하여 눈동자의 위치 좌표 검출
-    contours = sorted(contours, key=lambda x: cv.contourArea(x), reverse=False)
+    contours = sorted(contours, key=lambda x: cv.contourArea(x), reverse=True)
 
     return contours

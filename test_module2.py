@@ -138,10 +138,10 @@ def irisPosition(image, gray, eyePoints):
 
     # getting the max and min points of eye inorder to crop the eyes from Eye image .
 
-    maxX = (max(eyePoints, key=lambda item: item[0]))[0]
-    minX = (min(eyePoints, key=lambda item: item[0]))[0]
-    maxY = (max(eyePoints, key=lambda item: item[1]))[1]
-    minY = (min(eyePoints, key=lambda item: item[1]))[1]
+    max_x = (max(eyePoints, key=lambda item: item[0]))[0]
+    min_x = (min(eyePoints, key=lambda item: item[0]))[0]
+    max_y = (max(eyePoints, key=lambda item: item[1]))[1]
+    min_y = (min(eyePoints, key=lambda item: item[1]))[1]
 
     # other then eye area will black, making it white
     eye_image[mask == 0] = 255
@@ -151,26 +151,30 @@ def irisPosition(image, gray, eyePoints):
     eye_image = cv.GaussianBlur(eye_image, (0, 0), 1)
 
     # threshold_eye = cv.adaptiveThreshold(eye_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 51, 2)
-    _, threshold_eye = cv.threshold(eye_image, 45, 255, cv.THRESH_BINARY_INV)
+    _, threshold_eye = cv.threshold(eye_image, 48, 255, cv.THRESH_BINARY_INV)
 
     # 이진화된 이미지를 이용하여 이지미에서 눈동자의 위치 검출
     contour = contours(threshold_eye)
 
-    # 이미지의 가로, 세로 길이를 가져옴
-    rows, cols = eye_image.shape
-
     # 검출한 눈동자의 위치를 이용하여 인식한 눈동자의 외각선과 위치 좌표 줄력
     cnt = contour[0]
-    hull = cv.convexHull(cnt)
-    cv.drawContours(image, [hull], -1, BLUE, 2)
 
-    moment = cv.moments(hull)
-    cx = int(moment["m10"] / moment["m00"])
-    cy = int(moment["m01"] / moment["m00"])
-    print("눈동자 중심점", (cx, cy))
+    ellipse = cv.fitEllipse(cnt)
+    position = ellipse[0]
+    pos = []
+
+    for i in range(2):
+        pos.append(math.trunc(position[i]))
+    cv.ellipse(image, ellipse, BLUE, 2)
 
 
-    return image
+    # 눈동자의 위치를 눈 크기에 대해 상대 %로 계산 및 표시
+    x_per = ((pos[0] - min_x) / (max_x - min_x)) * 100
+    y_per = ((pos[1] - min_y) / (max_y - min_y)) * 100
+    x_per = math.trunc(x_per)
+    y_per = math.trunc(y_per)
+
+    return image, x_per, y_per
 
 def contours(threshold_image):
     # 이진화된 이미지에서 눈동자의 윤곽을 찾는다

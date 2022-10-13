@@ -1,11 +1,11 @@
 import cv2 as cv
-import test_module2 as m
+import module as m
 import os
 
-def eye_tracking(image):
+def eye_tracking(image, magnificate = 3):
     height, width = image.shape[:2]
 
-    image = cv.resize(image, (int(width*3), int(height*3)), cv.INTER_AREA)
+    image = cv.resize(image, (int(width*magnificate), int(height*magnificate)), cv.INTER_AREA)
 
     gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
@@ -17,8 +17,11 @@ def eye_tracking(image):
         right_eye_point = point_list[36:42]
         left_eye_point = point_list[42:48]
 
-        r_mask = m.irisPosition(image, gray_image, right_eye_point)
-        l_mask = m.irisPosition(image, gray_image, left_eye_point)
+        image, right_x_per, right_y_per = m.irisPosition(image, gray_image, right_eye_point)
+        image, left_x_per, left_y_per = m.irisPosition(image, gray_image, left_eye_point)
+
+    print("Right: " + "X" + "-" + str(right_x_per) + "%", "Y" + "-" + str(right_y_per) + "%")
+    print("Left: " + "X" + "-" + str(left_x_per) + "%", "Y" + "-" + str(left_y_per) + "%")
 
     cv.imshow("Picture", clone)
     cv.waitKey(0)
