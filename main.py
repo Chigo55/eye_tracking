@@ -18,7 +18,7 @@ def eye_tracking(image, magnificate=1, threshold=70):
     clone, faces = m.faceDetector(image, gray_image)
 
     # 감지한 얼굴을 이용하여 랜드마크를 찾고 표시한다. -> clone, point_lists = m.faceLandmarkDetector(image, gray_image, faces, Draw=True)
-    clone, point_lists = m.faceLandmarkDetector(image, gray_image, faces, Draw=False)
+    clone, point_lists = m.faceLandmarkDetector(image, gray_image, faces, Draw=True)
 
     # 랜드마크중 왼쪽 눈과 오른쪽 눈에 해당하는 랜드마크를 따로 가져온다.
     for point_list in point_lists:
@@ -26,12 +26,15 @@ def eye_tracking(image, magnificate=1, threshold=70):
         left_eye_point = point_list[42:48]
 
         # 따로 가져온 랜드마크를 이용하여 눈동자를 찾는다.
-        image, right_x_per, right_y_per = m.irisPosition(image, gray_image, right_eye_point, threshold)
-        image, left_x_per, left_y_per = m.irisPosition(image, gray_image, left_eye_point, threshold)
+        image, right_x_per, right_y_per, pos1 = m.irisPosition(image, gray_image, right_eye_point, threshold)
+        image, left_x_per, left_y_per, pos2 = m.irisPosition(image, gray_image, left_eye_point, threshold)
 
     # 찾은 눈동자의 좌표를 출력한다.
     print("Right: " + "X" + "-" + str(right_x_per) + "%", "Y" + "-" + str(right_y_per) + "%")
     print("Left: " + "X" + "-" + str(left_x_per) + "%", "Y" + "-" + str(left_y_per) + "%")
+
+    print(pos1)
+    print(pos2)
 
     # 모든 과정이 끝난 사진의 크기를 다시 읽어온다.
     height, width = image.shape[:2]

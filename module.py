@@ -158,6 +158,11 @@ def irisPosition(image, gray, eye_points, threshold):
     max_y = (max(eye_points, key=lambda item: item[1]))[1]
     min_y = (min(eye_points, key=lambda item: item[1]))[1]
 
+    cv.line(image, (min_x, min_y), (max_x, min_y), RED, 3)
+    cv.line(image, (max_x, min_y), (max_x, max_y), RED, 3)
+    cv.line(image, (max_x, max_y), (min_x, max_y), RED, 3)
+    cv.line(image, (min_x, max_y), (min_x, min_y), RED, 3)
+
     # 검은색의 마스크를 씌운 회색 이미지의 마스크를 흰색으로 변환
     eye_image[mask == 0] = 255
 
@@ -189,7 +194,7 @@ def irisPosition(image, gray, eye_points, threshold):
     x_per = math.trunc(x_per)
     y_per = math.trunc(y_per)
 
-    return image, x_per, y_per
+    return image, x_per, y_per, pos
 
 def contours(threshold_image):
     # 이진화된 이미지에서 눈동자의 윤곽을 찾는다
