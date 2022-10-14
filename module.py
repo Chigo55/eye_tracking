@@ -137,7 +137,8 @@ def blinkDetector(eye_point):
     return blinkRatio, top_mid, bottom_mid
 
 
-def irisPosition(image, gray ,eye_points):
+def irisPosition(image, gray ,eye_points, threshold):
+
     # 그레이 스케일 이미지의 디멘션 get
     dim = gray.shape
 
@@ -166,7 +167,7 @@ def irisPosition(image, gray ,eye_points):
     eye_image = cv.GaussianBlur(eye_image, (0, 0), 1)
 
     # 전역 임계처리를 이용하여 이미지의 이진화 및 임계처리
-    _, threshold_eye = cv.threshold(eye_image, 70, 255, cv.THRESH_BINARY_INV)
+    _, threshold_eye = cv.threshold(eye_image, threshold, 255, cv.THRESH_BINARY_INV)
 
     # 이진화된 이미지를 이용하여 이지미에서 눈동자로 인식되는 외각선 검출
     contour = contours(threshold_eye)
