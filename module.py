@@ -3,8 +3,6 @@ import dlib
 import math
 import numpy as np
 
-import module
-
 fonts = cv.FONT_HERSHEY_COMPLEX
 
 YELLOW = (0, 247, 255)
@@ -137,7 +135,7 @@ def blinkDetector(eye_point):
     return blinkRatio, top_mid, bottom_mid
 
 
-def irisPosition(image, gray ,eye_points, threshold):
+def irisPosition(image, gray, eye_points, threshold):
 
     # 그레이 스케일 이미지의 디멘션 get
     dim = gray.shape
@@ -145,13 +143,13 @@ def irisPosition(image, gray ,eye_points, threshold):
     # 마스크 생성
     mask = np.zeros(dim, dtype=np.uint8)
 
-    # 눈의 랜드마크 넘버링을 numpy의 array를 통해 변환
+    # 눈의 랜드마크 넘버링을 numpy의 array를 통해 사진의 좌표로 변환
     polly_points = np.array(eye_points, dtype=np.int32)
 
-    # 눈의 랜드마크를 흰색으로 채운다
+    # 눈 부분을 랜드마크를 이용하여 흰색으로 채운다
     cv.fillPoly(mask, [polly_points], 255)
 
-    # Bitwise and 오퍼레이터를 이용하여 마스크에 검은색으로 그레이 이미지 생성
+    # Bitwise and 오퍼레이터를 이용하여 회색 이미지에 마스크를 덮어 씌어 눈 부분만 나오게 한다
     eye_image = cv.bitwise_and(gray, gray, mask=mask)
 
     # 눈 이미지의 최소 지점과 최대 지점의 좌표를 구한다
@@ -160,7 +158,7 @@ def irisPosition(image, gray ,eye_points, threshold):
     max_y = (max(eye_points, key=lambda item: item[1]))[1]
     min_y = (min(eye_points, key=lambda item: item[1]))[1]
 
-    # 검은색의 마스크를 씌운 그레이 이미지의 마스크를 흰색으로 변환
+    # 검은색의 마스크를 씌운 회색 이미지의 마스크를 흰색으로 변환
     eye_image[mask == 0] = 255
 
     # 사진의 잡음 제거를 위해 가우시안 블러를 이용하여 블러 처리
