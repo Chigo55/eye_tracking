@@ -5,7 +5,7 @@ import os
 def eye_tracking(image, magnificate=1, threshold=70):
     # image: 사진 이미지 주소, magnificate: 사진 확대 배율(기본 1배), threshold: 임계값 처리시 허용 임계값(배율 1당 threshold +- 10이 적당)
 
-    # 이미즈의 크기를 읽어온다.
+    # 이미el의 크기를 읽어온다.
     height, width = image.shape[:2]
 
     # 읽어 들인 이미지의 크기를 이용하여 사진의 3배 확대 한다.
